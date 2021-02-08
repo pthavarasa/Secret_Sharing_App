@@ -1,0 +1,70 @@
+https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing
+https://www.google.com/search?rlz=1C1CHBD_frFR767FR767&sxsrf=ALeKk02iE7l1vPn54FRsqbk62jXMl-XhnQ%3A1602622115542&ei=oxKGX-nUII-9lwSNyZaADQ&q=different+secret+sharing+algorithm&oq=different+secret+sharing+algorithm&gs_lcp=CgZwc3ktYWIQAzoECAAQR0oFCCASATBKBQgoEgEwUPIYWPEeYPIfaABwAngAgAE7iAFskgEBMpgBAKABAaoBB2d3cy13aXrIAQfAAQE&sclient=psy-ab&ved=0ahUKEwipsp_PuLLsAhWP3oUKHY2kBdAQ4dUDCA0&uact=5
+https://en.wikipedia.org/wiki/Secret_sharing
+https://en.wikipedia.org/wiki/Shared_secret
+https://www.google.com/search?q=shamir%27s+scheme+vulnerability&rlz=1C1CHBD_frFR767FR767&oq=shamir%27s+scheme+vul&aqs=chrome.1.69i57j33i160.12207j0j7&sourceid=chrome&ie=UTF-8
+https://blog.keys.casa/shamirs-secret-sharing-security-shortcomings/
+https://www.youtube.com/results?search_query=ssss+shamir
+https://medium.com/keylesstech/a-beginners-guide-to-shamir-s-secret-sharing-e864efbf3648
+http://point-at-infinity.org/ssss/demo.html ########
+https://iancoleman.io/shamir/  #############
+https://simon-frey.com/s4/    #############
+https://github.com/dsprenkels/sss  
+http://manpages.ubuntu.com/manpages/trusty/man1/ssss-combine.1.html
+https://play.google.com/store/apps/details?id=io.ionic.sss&hl=fr&gl=US  ##########
+https://www.amazon.com/Mobile-Combine-Shamirs-Secret-Sharing/dp/B086PHQ9XF  #######
+https://github.com/grempe/secrets.js#api
+https://www.reddit.com/r/cryptography/comments/hzcf27/best_implementation_of_shamirs_secret_sharing/
+http://wwwusers.di.uniroma1.it/~patil/smart/ppt/zanin.pdf
+https://en.wikipedia.org/wiki/Finite_field
+https://crypto.stackexchange.com/questions/54150/what-are-the-weaknesses-of-shamirs-secret-sharing
+https://www.youtube.com/watch?v=iFY5SyY3IMQ
+https://www.youtube.com/watch?v=_mDlLKgiFDY
+https://www.youtube-nocookie.com/embed/TQ-DsEZBuQY
+https://www.youtube.com/results?search_query=shamir+threshold+scheme+
+https://www.geeksforgeeks.org/implementing-shamirs-secret-sharing-scheme-in-python/
+https://www.youtube.com/watch?v=eed1VQVn0eI
+https://www.google.com/search?q=usage+of+secret+sharing&rlz=1C1CHBD_frFR767FR767&oq=usage+of+secret+sharing&aqs=chrome..69i57j33i22i29i30.18599j0j7&sourceid=chrome&ie=UTF-8
+https://crypto.stackexchange.com/questions/22627/problem-in-understanding-blakleys-secret-sharing-scheme
+https://gitlab.com/dark-crystal-javascript/secret-sharing
+https://hal.archives-ouvertes.fr/hal-02903553/document
+https://www.jetico.com/how-use-secret-sharing-scheme
+https://www.youtube.com/watch?v=cRh-NCvHkzM
+http://iml.univ-mrs.fr/~kohel/tch/MATH3024/Lectures/lectures_11.pdf
+https://cs.uwaterloo.ca/~dstinson/ssbib.html
+https://web.mat.upc.edu/carles.padro/arc02v03.pdf
+https://qvault.io/2020/08/18/very-basic-shamirs-secret-sharing/
+http://chearp.free.fr/index.php?article6/securite-informatique
+
+
+
+what is ssss
+- history ect a propos(talk ablout allan movie aussi)(when i leand polynominal i never think so im so exited about samirs idea)
+- why ssss ( if n=m no need ssss use XOR cipher)
+- other similar programor algo et avantage de ssss
+- is there are an app or program
+how its work
+- fonctionnement(algo)
+- analyce de code source (ref : wiki)
+who use it
+is that secure
+what kind of vulnerablity have
+the big pb is there are not general ruls to implement(if we do with one we want recover by an other)
+- image and text is that safe encript with (AES) key and share ssss(key)
+- attacker must be the person who use so we have to protect more 
+	(defend on screenshots), 
+	(own camera bcs we can recover a deleted photo), 
+	(gps not posible pokemon go locantion imitate)
+	(check if phone is rooted)
+	(local wifi or bleutooth[on a pas connecté toulemonde en une fois])
+our idea and how we will builld
+- react native vs flutter
+
+
+QRcode using trasfert info
+
+omment commencer ?
+Comment s’organiser ? 
+Comment répartir le travail ?
+Comment faire ? Qui fait quoi ?
+Comment travailler en binome hors des heures de cours ?
