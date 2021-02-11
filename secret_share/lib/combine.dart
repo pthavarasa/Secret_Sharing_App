@@ -1,8 +1,9 @@
-import 'dart:math';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ntcdcrypto/ntcdcrypto.dart';
-import 'package:nearby_connections/nearby_connections.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:secret_share/dataStore.dart';
+import 'package:secret_share/nearby_connection.dart';
 
 class Combine extends StatefulWidget {
   @override
@@ -10,94 +11,131 @@ class Combine extends StatefulWidget {
 }
 
 class _CombineState extends State<Combine> {
-  List<String> items = List<String>();
-  final myController = TextEditingController();
+  String combinedSecret = 'Combined secret :)';
+  List<String> secretItems = List<String>();
+  List<String> secretItemsList = List<String>();
+  List<String> titleItems = List<String>();
+  List<String> titleItemsList = List<String>();
+  DataStore secret = DataStore(key: 'secret');
+  DataStore title = DataStore(key: 'title');
+  Connection connec = Connection();
+  bool isSwitchedAdvertising = false;
+  List<DropdownMenuItem<int>> titleItemsMenu = [];
+  int selectedTitleItems;
 
-  @override
-  void initState(){
-    getData();
-  }
-
-  void shareCombine(){
-    SSS sss = new SSS();
-    setState(() {
-      myController.text = sss.combine(items, true);
+  void loadtitleItemsMenu() {
+    titleItemsMenu = [];
+    titleItems.asMap().forEach((key, value) {
+      titleItemsMenu.add(DropdownMenuItem(
+        child: Text(value),
+        value: key,
+      ));
     });
   }
 
-  void getData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getStringList("secret") != null){
+  @override
+  void initState(){
+    super.initState();
+    secret.getData().then((value) => setState(() => secretItems = value ));
+    title.getData().then((value) => setState(() => titleItems = value ));
+    connec.receivedString((str){
+      List<String> data = List<String>.from(jsonDecode(str));
       setState(() {
-        items = prefs.getStringList("secret");
+        titleItems.add(data[0]);
+        secretItems.add(data[1]);
       });
-    }
+    });
+    connec.setContext(context);
   }
 
-  final String userName = Random().nextInt(10000).toString();
-  final Strategy strategy = Strategy.P2P_STAR;
-
-  String cId = "0"; //currently connected device ID
-
-  void showSnackbar(dynamic a) {
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(a.toString()),
-    ));
+  @override
+  void dispose(){
+    connec.stopAllEndpoints();
+    super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
+    loadtitleItemsMenu();
     return Scaffold(
       body: Column(
         children: [
-          RaisedButton(
-            child: Text('Peer Device'),
-            onPressed: () async {
-              if (await Nearby().checkLocationPermission()) {
-                print('Location permissions granted :)');
-              }else{
-                await Nearby().askLocationPermission();
-              }
-              if (await Nearby().checkLocationEnabled()) {
-                print('Location is ON :)');
-              }else{
-                await Nearby().enableLocationServices();
-              }
-              try {
-                bool a = await Nearby().startAdvertising(
-                  userName,
-                  strategy,
-                  onConnectionInitiated: onConnectionInit,
-                  onConnectionResult: (id, status) {
-                    showSnackbar(status);
-                  },
-                  onDisconnected: (id) {
-                    showSnackbar("Disconnected: " + id);
-                  },
-                );
-                showSnackbar("ADVERTISING: " + a.toString());
-              } catch (exception) {
-                showSnackbar(exception);
-              }
-            },
-            color: Colors.lightBlue,
-            textColor: Colors.white,
-          ),
-          RaisedButton(
-              child: Text("Stop All Endpoints"),
-              onPressed: () async {
-                await Nearby().stopAllEndpoints();
-              },
+          Card(
+            child: ListTile(
+              title: Text('Make Connection'),
+              subtitle: isSwitchedAdvertising? 
+                Text("Advertising for device") : 
+                Text("Stopped advertising"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Switch(
+                    value: isSwitchedAdvertising,
+                    onChanged: (value){
+                      setState(() {
+                        isSwitchedAdvertising = value;
+                      });
+                      if(value){
+                        connec.permissionsHandling();
+                        connec.startAdvertising();
+                      }else{
+                        connec.stopAdvertising();
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.info_outline_rounded,
+                      size: 25.0,
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) => 
+                          connec.connectionAboutDialog(context)
+                      );
+                    },
+                  ),
+                ]
+              )
             ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              DropdownButton(
+                hint: new Text('Select your share'),
+                items: titleItemsMenu,
+                value: selectedTitleItems,
+                onChanged: (value) {
+                  setState(() {
+                    selectedTitleItems = value;
+                  });
+                }
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.add_circle_outline,
+                  size: 25.0,
+                  color: Colors.brown[900],
+                ),
+                onPressed: () {
+                  setState(() {
+                    titleItemsList.add(titleItems[selectedTitleItems]);
+                    secretItemsList.add(secretItems[selectedTitleItems]);
+                  });
+                },
+              ),
+            ]
+          ),
           Expanded(
             child: ListView.builder(
-              itemCount: items.length,
+              itemCount: titleItemsList.length,
               itemBuilder: (context, index){
                 return Card(
                   child: ListTile(
                     onLongPress: (){},
-                    title: Text(items[index]),
+                    title: Text(titleItemsList[index]),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
@@ -107,7 +145,12 @@ class _CombineState extends State<Combine> {
                             size: 20.0,
                             color: Colors.brown[900],
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              titleItemsList.removeAt(index);
+                              secretItems.removeAt(index);
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -137,82 +180,32 @@ class _CombineState extends State<Combine> {
               top: 20.0
             )
           ),
-          TextField(
-            controller: myController,
-            maxLines: null,
-            keyboardType: TextInputType.multiline,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(), 
-              labelText: 'Secret'
-            )
+          Card(
+            child: ListTile(
+              title: Text(combinedSecret),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(
+                      Icons.copy,
+                      size: 25.0,
+                    ),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: combinedSecret));
+                      connec.showSnackbar('Secret copied to clipboard');
+                    },
+                  ),
+                ]
+              )
+            ),
           ),
         ]
       )
     );
   }
-  /// Called upon Connection request (on both devices)
-  /// Both need to accept connection to start sending/receiving
-  void onConnectionInit(String id, ConnectionInfo info) {
-    showModalBottomSheet(
-      context: context,
-      builder: (builder) {
-        return Center(
-          child: Column(
-            children: <Widget>[
-              Text("id: " + id),
-              Text("Token: " + info.authenticationToken),
-              Text("Name" + info.endpointName),
-              Text("Incoming: " + info.isIncomingConnection.toString()),
-              RaisedButton(
-                child: Text("Accept Connection"),
-                onPressed: () {
-                  Navigator.pop(context);
-                  cId = id;
-                  Nearby().acceptConnection(
-                    id,
-                    onPayLoadRecieved: (endid, payload) async {
-                      if (payload.type == PayloadType.BYTES) {
-                        String str = String.fromCharCodes(payload.bytes);
-                        showSnackbar(endid + ": " + str);
-                        setState(() {
-                          items.add(str);
-                        });
-                      }
-                    },
-                    onPayloadTransferUpdate: (endid, payloadTransferUpdate) {
-                      if (payloadTransferUpdate.status ==
-                          PayloadStatus.IN_PROGRRESS) {
-                        print(payloadTransferUpdate.bytesTransferred);
-                      } else if (payloadTransferUpdate.status ==
-                          PayloadStatus.FAILURE) {
-                        print("failed");
-                        showSnackbar(endid + ": FAILED to transfer file");
-                      } else if (payloadTransferUpdate.status ==
-                          PayloadStatus.SUCCESS) {
-                        showSnackbar(
-                            "success, total bytes = ${payloadTransferUpdate.totalBytes}");
 
-                        
-                      }
-                    },
-                  );
-                },
-              ),
-              RaisedButton(
-                child: Text("Reject Connection"),
-                onPressed: () async {
-                  Navigator.pop(context);
-                  try {
-                    await Nearby().rejectConnection(id);
-                  } catch (e) {
-                    showSnackbar(e);
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  void shareCombine(){
+    setState(() => combinedSecret = SSS().combine(secretItemsList, true));
   }
 }

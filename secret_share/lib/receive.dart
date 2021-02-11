@@ -1,8 +1,7 @@
-import 'dart:math';
-import 'dart:typed_data';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:nearby_connections/nearby_connections.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:secret_share/dataStore.dart';
+import 'package:secret_share/nearby_connection.dart';
 
 class Receive extends StatefulWidget {
   @override
@@ -10,42 +9,32 @@ class Receive extends StatefulWidget {
 }
 
 class _ReceiveState extends State<Receive> {
-  List<String> items = List<String>();
+  List<String> secretItems = List<String>();
+  List<String> titleItems = List<String>();
+  DataStore secret = DataStore(key: 'secret');
+  DataStore title = DataStore(key: 'title');
+  Connection connec = Connection();
+  bool isSwitchedDiscovering = false;
 
   @override
   void initState(){
-    getData();
-  }
-
-  void getData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getStringList("secret") != null){
-      setState(() {
-        items = prefs.getStringList("secret");
-      });
-    }
-  }
-
-  final String userName = Random().nextInt(10000).toString();
-  final Strategy strategy = Strategy.P2P_STAR;
-
-  String cId = "0"; //currently connected device ID
-
-  void showSnackbar(dynamic a) {
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(a.toString()),
-    ));
-  }
-
-  void saveRecievedData (String data) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getStringList("secret") != null){
-        items = prefs.getStringList("secret");
-    }
-    setState(() {
-      items.add(data);
+    super.initState();
+    secret.getData().then((value) => setState(() => secretItems = value ));
+    title.getData().then((value) => setState(() => titleItems = value ));
+    connec.receivedString((str){
+      List<String> data = List<String>.from(jsonDecode(str));
+      secret.updateData(data[1]);
+      title.updateData(data[0]);
+      secret.getData().then((value) => setState(() => secretItems = value ));
+      title.getData().then((value) => setState(() => titleItems = value ));
     });
-    prefs.setStringList('secret', items);
+    connec.setContext(context);
+  }
+
+  @override
+  void dispose(){
+    connec.stopAllEndpoints();
+    super.dispose();
   }
 
   @override
@@ -53,85 +42,55 @@ class _ReceiveState extends State<Receive> {
     return Scaffold(
       body: Column(
         children: [
-          RaisedButton(
-            child: Text('Receive Mode'),
-            onPressed: () async {
-                    if (await Nearby().checkLocationPermission()) {
-                      print('Location permissions granted :)');
-                    }else{
-                      await Nearby().askLocationPermission();
-                    }
-                    if (await Nearby().checkLocationEnabled()) {
-                      print('Location is ON :)');
-                    }else{
-                      await Nearby().enableLocationServices();
-                    }
-                    try {
-                      bool a = await Nearby().startDiscovery(
-                        userName,
-                        strategy,
-                        onEndpointFound: (id, name, serviceId) {
-                          // show sheet automatically to request connection
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (builder) {
-                              return Center(
-                                child: Column(
-                                  children: <Widget>[
-                                    Text("id: " + id),
-                                    Text("Name: " + name),
-                                    Text("ServiceId: " + serviceId),
-                                    RaisedButton(
-                                      child: Text("Request Connection"),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        Nearby().requestConnection(
-                                          userName,
-                                          id,
-                                          onConnectionInitiated: (id, info) {
-                                            onConnectionInit(id, info);
-                                          },
-                                          onConnectionResult: (id, status) {
-                                            showSnackbar(status);
-                                          },
-                                          onDisconnected: (id) {
-                                            showSnackbar(id);
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        onEndpointLost: (id) {
-                          showSnackbar("Lost Endpoint:" + id);
-                        },
+          Card(
+            child: ListTile(
+              title: Text('Make Connection'),
+              subtitle: isSwitchedDiscovering? 
+                Text("Discovering device") : 
+                Text("Stopped Discovering"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Switch(
+                    value: isSwitchedDiscovering,
+                    onChanged: (value){
+                      setState(() {
+                        isSwitchedDiscovering = value;
+                      });
+                      if(value){
+                        connec.permissionsHandling();
+                        connec.startDiscovering();
+                      }else{
+                        connec.stopDiscovery();
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.info_outline_rounded,
+                      size: 25.0,
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) => 
+                          connec.connectionAboutDialog(context)
                       );
-                      showSnackbar("DISCOVERING: " + a.toString());
-                    } catch (e) {
-                      showSnackbar(e);
-                    }
-                  },
-            color: Colors.lightBlue,
-            textColor: Colors.white,
-          ),
-          RaisedButton(
-              child: Text("Stop All Endpoints"),
-              onPressed: () async {
-                await Nearby().stopAllEndpoints();
-              },
+                    },
+                  ),
+                ]
+              )
             ),
+          ),
           Expanded(
             child: ListView.builder(
-              itemCount: items.length,
+              itemCount: titleItems.length,
               itemBuilder: (context, index){
                 return Card(
                   child: ListTile(
                     onLongPress: () =>_showDialog(index),
-                    title: Text(items[index]),
+                    title: Text(titleItems[index]),
+                    subtitle: Text(DateTime.now().toString()),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
@@ -142,14 +101,12 @@ class _ReceiveState extends State<Receive> {
                             color: Colors.brown[900],
                           ),
                           onPressed: () async {
-                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                            if(prefs.getStringList("secret") != null){
-                                items = prefs.getStringList("secret");
-                            }
+                            secret.removeData(index);
+                            title.removeData(index);
                             setState(() {
-                              items.removeAt(index);
+                              titleItems.removeAt(index);
+                              secretItems.removeAt(index);
                             });
-                            prefs.setStringList('secret', items);
                           },
                         ),
                         IconButton(
@@ -159,9 +116,7 @@ class _ReceiveState extends State<Receive> {
                             color: Colors.brown[900],
                           ),
                           onPressed: () async {
-                                String a = items[index];
-                                showSnackbar("Sending $a to $cId");
-                                Nearby().sendBytesPayload(cId, Uint8List.fromList(a.codeUnits));
+                                connec.sendString(jsonEncode([titleItems[index], secretItems[index]]));
                               },
                         ),
                       ],
@@ -189,7 +144,7 @@ class _ReceiveState extends State<Receive> {
                 autofocus: true,
                 decoration: new InputDecoration(
                     labelText: 'Rename', 
-                    hintText: items[index].toString() + ' to ...'),
+                    hintText: titleItems[index].toString() + ' to ...'),
               ),
             )
           ],
@@ -203,75 +158,12 @@ class _ReceiveState extends State<Receive> {
           new FlatButton(
               child: const Text('RENAME'),
               onPressed: () {
-                items[index] = myController.text;
-                setState(() { items[index] = myController.text; });
+                titleItems[index] = myController.text;
+                setState(() { titleItems[index] = myController.text; });
                 Navigator.pop(context);
               })
         ],
       ),
-    );
-  }
-  /// Called upon Connection request (on both devices)
-  /// Both need to accept connection to start sending/receiving
-  void onConnectionInit(String id, ConnectionInfo info) {
-    showModalBottomSheet(
-      context: context,
-      builder: (builder) {
-        return Center(
-          child: Column(
-            children: <Widget>[
-              Text("id: " + id),
-              Text("Token: " + info.authenticationToken),
-              Text("Name" + info.endpointName),
-              Text("Incoming: " + info.isIncomingConnection.toString()),
-              RaisedButton(
-                child: Text("Accept Connection"),
-                onPressed: () {
-                  Navigator.pop(context);
-                  cId = id;
-                  Nearby().acceptConnection(
-                    id,
-                    onPayLoadRecieved: (endid, payload) async {
-                      if (payload.type == PayloadType.BYTES) {
-                        String str = String.fromCharCodes(payload.bytes);
-                        showSnackbar(endid + ": " + str);
-                        saveRecievedData(str);
-                      }
-                    },
-                    onPayloadTransferUpdate: (endid, payloadTransferUpdate) {
-                      if (payloadTransferUpdate.status ==
-                          PayloadStatus.IN_PROGRRESS) {
-                        print(payloadTransferUpdate.bytesTransferred);
-                      } else if (payloadTransferUpdate.status ==
-                          PayloadStatus.FAILURE) {
-                        print("failed");
-                        showSnackbar(endid + ": FAILED to transfer file");
-                      } else if (payloadTransferUpdate.status ==
-                          PayloadStatus.SUCCESS) {
-                        showSnackbar(
-                            "success, total bytes = ${payloadTransferUpdate.totalBytes}");
-
-                        
-                      }
-                    },
-                  );
-                },
-              ),
-              RaisedButton(
-                child: Text("Reject Connection"),
-                onPressed: () async {
-                  Navigator.pop(context);
-                  try {
-                    await Nearby().rejectConnection(id);
-                  } catch (e) {
-                    showSnackbar(e);
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }
