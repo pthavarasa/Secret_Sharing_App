@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       title: 'Bottom Navigation Bar', 
       theme: ThemeData(
         primaryColor: Colors.blue, 
-        accentColor: Colors.yellowAccent
+        accentColor: Colors.blueAccent
       ),
       home: SplashScreen(),
       routes: {
