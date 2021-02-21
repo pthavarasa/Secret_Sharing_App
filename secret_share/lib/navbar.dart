@@ -28,7 +28,7 @@ class _NavbarState extends State<Navbar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text('Secret Sharing'))
+        title: Center(child: Text('Secret Sharing App'))
       ),
       body: Center(child: _widgetOptions.elementAt(_selectedNavIdex)),
       bottomNavigationBar: BottomNavigationBar(

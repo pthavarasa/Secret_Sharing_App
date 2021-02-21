@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bottom Navigation Bar', 
+      title: 'Secret Sharing App', 
       theme: ThemeData(
         primaryColor: Colors.blue, 
         accentColor: Colors.blueAccent
