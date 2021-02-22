@@ -6,15 +6,17 @@ import 'package:ntcdcrypto/ntcdcrypto.dart';
 import 'package:secret_share/dataStore.dart';
 import 'package:secret_share/nearby_connection.dart';
 
+
+final titleController = TextEditingController();
+final secretController = TextEditingController();
+List<String> items = List<String>();
+
 class Split extends StatefulWidget {
   @override
   _SplitState createState() => _SplitState();
 }
 
 class _SplitState extends State<Split> {
-  List<String> items = List<String>();
-  final titleController = TextEditingController();
-  final secretController = TextEditingController();
   List<String> arr = List<String>();
   DataStore title = DataStore(key: 'title');
   DataStore secret = DataStore(key: 'secret');

@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:secret_share/dataStore.dart';
 import 'package:secret_share/nearby_connection.dart';
+import 'package:share/share.dart';
+
+enum WhyFarther { send, share }
 
 class Receive extends StatefulWidget {
   @override
@@ -109,16 +112,44 @@ class _ReceiveState extends State<Receive> {
                             });
                           },
                         ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.send,
-                            size: 20.0,
-                            color: Colors.brown[900],
-                          ),
-                          onPressed: () async {
-                                connec.sendString(jsonEncode([titleItems[index], secretItems[index]]));
-                              },
-                        ),
+                        PopupMenuButton<WhyFarther>(
+                          onSelected: (WhyFarther result) {
+                            if(result == WhyFarther.send)
+                              connec.sendString(jsonEncode([titleItems[index], secretItems[index]]));
+                            if(result == WhyFarther.share)
+                              Share.share(secretItems[index], subject: titleItems[index]);
+                          },
+                          itemBuilder: (BuildContext context) => <PopupMenuEntry<WhyFarther>>[
+                            PopupMenuItem<WhyFarther>(
+                              value: WhyFarther.send,
+                              child: Row(
+                                children: <Widget>[
+                                  Icon(Icons.send_sharp),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: 10.0
+                                    )
+                                  ),
+                                  Text('Send'),
+                                ]
+                              ),
+                            ),
+                            PopupMenuItem<WhyFarther>(
+                              value: WhyFarther.share,
+                              child: Row(
+                                children: <Widget>[
+                                  Icon(Icons.share),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: 10.0
+                                    )
+                                  ),
+                                  Text('Share'),
+                                ]
+                              ),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),
@@ -158,7 +189,6 @@ class _ReceiveState extends State<Receive> {
           new FlatButton(
               child: const Text('RENAME'),
               onPressed: () {
-                titleItems[index] = myController.text;
                 setState(() { titleItems[index] = myController.text; });
                 Navigator.pop(context);
               })

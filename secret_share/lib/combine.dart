@@ -5,6 +5,9 @@ import 'package:ntcdcrypto/ntcdcrypto.dart';
 import 'package:secret_share/dataStore.dart';
 import 'package:secret_share/nearby_connection.dart';
 
+List<String> secretItemsList = List<String>();
+  List<String> titleItemsList = List<String>();
+
 class Combine extends StatefulWidget {
   @override
   _CombineState createState() => _CombineState();
@@ -13,9 +16,7 @@ class Combine extends StatefulWidget {
 class _CombineState extends State<Combine> {
   String combinedSecret = 'Combined secret :)';
   List<String> secretItems = List<String>();
-  List<String> secretItemsList = List<String>();
   List<String> titleItems = List<String>();
-  List<String> titleItemsList = List<String>();
   DataStore secret = DataStore(key: 'secret');
   DataStore title = DataStore(key: 'title');
   Connection connec = Connection();
@@ -120,10 +121,13 @@ class _CombineState extends State<Combine> {
                   color: Colors.brown[900],
                 ),
                 onPressed: () {
-                  setState(() {
-                    titleItemsList.add(titleItems[selectedTitleItems]);
-                    secretItemsList.add(secretItems[selectedTitleItems]);
-                  });
+                  if(selectedTitleItems != null)
+                    setState(() {
+                      titleItemsList.add(titleItems[selectedTitleItems]);
+                      secretItemsList.add(secretItems[selectedTitleItems]);
+                    });
+                  else
+                    connec.showSnackbar('Select share before add!');
                 },
               ),
             ]
@@ -148,7 +152,7 @@ class _CombineState extends State<Combine> {
                           onPressed: () {
                             setState(() {
                               titleItemsList.removeAt(index);
-                              secretItems.removeAt(index);
+                              secretItemsList.removeAt(index);
                             });
                           },
                         ),
@@ -206,6 +210,13 @@ class _CombineState extends State<Combine> {
   }
 
   void shareCombine(){
-    setState(() => combinedSecret = SSS().combine(secretItemsList, true));
+    if(secretItemsList.isNotEmpty){
+      try {
+        String cs = SSS().combine(secretItemsList, true);
+        setState(() => combinedSecret = cs);
+      } on Exception catch (e) {
+        connec.showSnackbar(e);
+      }
+    }else connec.showSnackbar('Invalid shares, add shares!');
   }
 }

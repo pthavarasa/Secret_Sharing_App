@@ -30,6 +30,7 @@ dependencies:
   shared_preferences: ^0.5.12+4
   device_info: ^1.0.0
   flutter_launcher_icons: ^0.8.1
+  share: ^0.6.5+4
 
 flutter_icons:
   image_path: "lib/assets/images/logo.png"
