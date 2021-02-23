@@ -69,7 +69,7 @@ dev_dependencies:
   flutter_launcher_icons: "^0.8.0"
 
 flutter_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
   image_path: "assets/icon/icon.png"
 ```
