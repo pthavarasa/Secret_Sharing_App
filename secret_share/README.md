@@ -110,4 +110,4 @@ To more details : [Flutter docs](https://flutter.dev/docs/deployment/android)
 
 ## Contributors
 
-@pablo , @@AndyGuillaume , @pthavarasa
+@pablo , @AndyGuillaume , @pthavarasa
