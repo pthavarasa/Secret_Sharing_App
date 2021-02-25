@@ -1,7 +1,7 @@
 <div align="center">
   <h1>
     <br>
-    <a href="http://www.amitmerchant.com/electron-markdownify"><img src="lib/assets/images/logo.png" alt="Markdownify" width="200"></a>
+    <a href=""><img src="lib/assets/images/logo.png" alt="Markdownify" width="200"></a>
     <br>
     Projets Tuteuré - Shamir's Secret Sharing Scheme
     <br>
