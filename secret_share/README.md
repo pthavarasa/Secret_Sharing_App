@@ -11,10 +11,10 @@
 <div align="center"><h4>A secret sharing Android and IOS app built on <a href="https://flutter.dev/" target="_blank">Flutter</a>.</h4></div>
 
 <div align="center">
-  <a href="#About-SSSS">About SSSS</a> •
-  <a href="#Installation">Installation</a> •
-  <a href="#How-to-use">How To Use</a> •
-  <a href="#Features">Features</a> •
+  <a href="#about-shamirs-secret-sharing-scheme">About SSSS</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#how-to-use">How To Use</a> •
+  <a href="#features">Features</a> •
   <a href="#license">License</a>
 </div>
 
