@@ -10,15 +10,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Secret Sharing App', 
-      theme: ThemeData(
-        primaryColor: Colors.blue, 
-        accentColor: Colors.blueAccent
-      ),
+      title: 'Secret Sharing App2',
+      theme:
+          ThemeData(primaryColor: Colors.blue, accentColor: Colors.blueAccent),
       home: SplashScreen(),
-      routes: {
-        '/home': (BuildContext context) => Navbar()
-      },
+      routes: {'/home': (BuildContext context) => Navbar()},
     );
   }
 }
