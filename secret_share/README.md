@@ -104,6 +104,19 @@ To more details : [Flutter docs](https://flutter.dev/docs/deployment/android)
 - sharing of secrets in part(Stream)
 - photo implementation
 
+## Version
+
+```bash
+Flutter_version = '1.22.6' (channel stable)
+Dart_SDK_version = '2.10.5'
+kotlin_version = '1.3.50'
+gradle_version = '3.5.4'
+```
+
+## issue & solution
+
+- https://github.com/miguelpruivo/flutter_file_picker/wiki/Troubleshooting#-issue-2
+
 ## license
 
 ...
