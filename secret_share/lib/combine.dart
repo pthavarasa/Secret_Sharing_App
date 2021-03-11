@@ -1,14 +1,19 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ntcdcrypto/ntcdcrypto.dart';
 import 'package:secret_share/dataStore.dart';
 import 'package:secret_share/nearby_connection.dart';
 import 'package:secret_share/secret.dart';
+import 'package:file_picker/file_picker.dart';
 
 //List<String> secretItemsList = List<String>();
 //List<String> titleItemsList = List<String>();
 List<Secret> itemsList = List<Secret>();
+bool isImage = false;
+String title = '';
+String type = '';
 
 class Combine extends StatefulWidget {
   @override
@@ -117,16 +122,36 @@ class _CombineState extends State<Combine> {
             color: Colors.brown[900],
           ),
           onPressed: () {
-            if (selectedTitleItems != null)
-              setState(() {
-                //titleItemsList.add(titleItems[selectedTitleItems]);
-                //secretItemsList.add(secretItems[selectedTitleItems]);
-                itemsList.add(items[selectedTitleItems]);
-              });
-            else
+            if (selectedTitleItems != null) {
+              if (itemsList.isEmpty) {
+                isImage =
+                    (items[selectedTitleItems].type == 'text') ? false : true;
+                title = items[selectedTitleItems].title;
+                type = items[selectedTitleItems].type.split('/').last;
+              }
+              if (itemsList
+                  .where((val) => val.type != items[selectedTitleItems].type)
+                  .isEmpty)
+                setState(() {
+                  //titleItemsList.add(titleItems[selectedTitleItems]);
+                  //secretItemsList.add(secretItems[selectedTitleItems]);
+                  itemsList.add(items[selectedTitleItems]);
+                });
+              else
+                connec.showSnackbar('mixed type!');
+            } else
               connec.showSnackbar('Select share before add!');
           },
         ),
+        TextButton(
+          child: Text('choose file'),
+          style: TextButton.styleFrom(
+            primary: Colors.white,
+            backgroundColor: Colors.grey,
+            onSurface: Colors.grey,
+          ),
+          onPressed: selectFile,
+        )
       ]),
       Expanded(
           child: ListView.builder(
@@ -186,9 +211,33 @@ class _CombineState extends State<Combine> {
                   connec.showSnackbar('Secret copied to clipboard');
                 },
               ),
+              IconButton(
+                icon: Icon(
+                  Icons.remove_red_eye,
+                  size: 25.0,
+                ),
+                onPressed: () {
+                  if (isImage && title != '')
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => MyApp()));
+                },
+              ),
             ])),
       ),
     ]));
+  }
+
+  void selectFile() async {
+    FilePickerResult result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      File file = File(result.files.single.path);
+      setState(() {
+        itemsList.add(Secret.fromJson(jsonDecode(file.readAsStringSync())));
+      });
+    } else {
+      // User canceled the picker
+    }
   }
 
   void shareCombine() {
@@ -196,11 +245,25 @@ class _CombineState extends State<Combine> {
       try {
         String cs =
             SSS().combine(itemsList.map((val) => val.share).toList(), true);
-        setState(() => combinedSecret = cs);
+        if (isImage) {
+          File file = File('/storage/emulated/0/Download/$title.$type');
+          file.writeAsBytesSync(base64Decode(cs));
+        } else
+          setState(() => combinedSecret = cs);
       } on Exception catch (e) {
         connec.showSnackbar(e);
       }
     } else
       connec.showSnackbar('Invalid shares, add shares!');
+  }
+}
+
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Image.file(File('/storage/emulated/0/Download/$title.$type')),
+    );
   }
 }
