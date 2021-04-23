@@ -54,6 +54,14 @@ class Connection {
     }
   }
 
+  void askStoragePermission() async {
+    Nearby().askLocationAndExternalStoragePermission();
+  }
+
+  Future<bool> checkStoragePermission() async {
+    return await Nearby().checkExternalStoragePermission();
+  }
+
   void stopAdvertising() async {
     if (!isStartAdvertising) await Nearby().stopAdvertising();
     //isStartAdvertising = false;

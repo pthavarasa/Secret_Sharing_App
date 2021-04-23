@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:ntcdcrypto/ntcdcrypto.dart';
 import 'package:secret_share/dataStore.dart';
 import 'package:secret_share/nearby_connection.dart';
 import 'package:share/share.dart';
 import 'package:secret_share/secret.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:downloads_path_provider/downloads_path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 enum WhyFarther { send, share, saveAs }
 
@@ -168,9 +172,13 @@ class _ReceiveState extends State<Receive> {
   }
 
   void saveFile(String fileName, String content) async {
-    File file = File('/storage/emulated/0/Download/$fileName.json');
-    file.writeAsString(content);
-    connec.showSnackbar('Secret saved as file in Download directory.');
+    if (await connec.checkStoragePermission()) {
+      File file = File('/storage/emulated/0/Download/$fileName.json');
+      file.writeAsString(content);
+      connec.showSnackbar('Secret saved as file in Download directory.');
+    } else {
+      connec.askStoragePermission();
+    }
   }
 
   _showDialog(index) async {

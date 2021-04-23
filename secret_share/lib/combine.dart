@@ -232,22 +232,39 @@ class _CombineState extends State<Combine> {
 
     if (result != null) {
       File file = File(result.files.single.path);
+      Secret secret = Secret.fromJson(jsonDecode(file.readAsStringSync()));
       setState(() {
-        itemsList.add(Secret.fromJson(jsonDecode(file.readAsStringSync())));
+        if (itemsList.isEmpty) {
+          isImage = (secret.type == 'text') ? false : true;
+          title = secret.title;
+          type = secret.type.split('/').last;
+        }
+        if (itemsList.where((val) => val.type != secret.type).isEmpty)
+          setState(() {
+            //titleItemsList.add(titleItems[selectedTitleItems]);
+            //secretItemsList.add(secretItems[selectedTitleItems]);
+            itemsList.add(secret);
+          });
+        else
+          connec.showSnackbar('mixed type!');
       });
     } else {
       // User canceled the picker
     }
   }
 
-  void shareCombine() {
+  void shareCombine() async {
     if (itemsList.isNotEmpty) {
       try {
         String cs =
             SSS().combine(itemsList.map((val) => val.share).toList(), true);
         if (isImage) {
-          File file = File('/storage/emulated/0/Download/$title.$type');
-          file.writeAsBytesSync(base64Decode(cs));
+          if (await connec.checkStoragePermission()) {
+            File file = File('/storage/emulated/0/Download/$title.$type');
+            file.writeAsBytesSync(base64Decode(cs));
+          } else {
+            connec.askStoragePermission();
+          }
         } else
           setState(() => combinedSecret = cs);
       } on Exception catch (e) {

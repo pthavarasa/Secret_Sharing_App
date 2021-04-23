@@ -219,7 +219,6 @@ class _SplitState extends State<Split> {
 
   void selectFile() async {
     FilePickerResult result = await FilePicker.platform.pickFiles();
-
     if (result != null) {
       File file = File(result.files.single.path);
       secretController.text = result.files.first.name;
