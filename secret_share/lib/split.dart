@@ -43,7 +43,7 @@ class _SplitState extends State<Split> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.all(25.0),
+        padding: EdgeInsets.all(20.0),
         child: Column(
           children: <Widget>[
             Card(
@@ -82,14 +82,14 @@ class _SplitState extends State<Split> {
                     ),
                   ])),
             ),
-            Padding(padding: EdgeInsets.only(top: 20.0)),
+            Padding(padding: EdgeInsets.only(top: 10.0)),
             TextField(
                 controller: titleController,
                 autofocus: false,
                 keyboardType: TextInputType.multiline,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(), labelText: 'Title')),
-            Padding(padding: EdgeInsets.only(top: 20.0)),
+            Padding(padding: EdgeInsets.only(top: 10.0)),
             TextField(
                 controller: secretController,
                 maxLines: null,
@@ -98,7 +98,7 @@ class _SplitState extends State<Split> {
                 decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Secret to crypt')),
-            Padding(padding: EdgeInsets.only(top: 20.0)),
+            Padding(padding: EdgeInsets.only(top: 10.0)),
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
               MaterialButton(
                 onPressed: selectFile,
@@ -151,7 +151,7 @@ class _SplitState extends State<Split> {
                 Text('Shares')
               ],
             ),
-            Padding(padding: EdgeInsets.only(top: 20.0)),
+            Padding(padding: EdgeInsets.only(top: 10.0)),
             MaterialButton(
               onPressed: splitShares,
               color: Colors.blue,
