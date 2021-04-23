@@ -32,9 +32,6 @@ dependencies:
   flutter_launcher_icons: ^0.8.1
   share: ^0.6.5+4
   file_picker: ^2.1.7
-  path_provider: ^1.6.28
-  downloads_path_provider: ^0.1.0
-  permission_handler: ^5.1.0
 
 flutter_icons:
   image_path: "lib/assets/images/logo.png"

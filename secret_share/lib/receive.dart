@@ -1,14 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:ntcdcrypto/ntcdcrypto.dart';
 import 'package:secret_share/dataStore.dart';
 import 'package:secret_share/nearby_connection.dart';
 import 'package:share/share.dart';
 import 'package:secret_share/secret.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:downloads_path_provider/downloads_path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 enum WhyFarther { send, share, saveAs }
 
