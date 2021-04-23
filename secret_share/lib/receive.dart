@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:secret_share/dataStore.dart';
 import 'package:secret_share/nearby_connection.dart';
 import 'package:share/share.dart';
 import 'package:secret_share/secret.dart';
 
-enum WhyFarther { send, share }
+enum WhyFarther { send, share, saveAs }
 
 class Receive extends StatefulWidget {
   @override
@@ -125,6 +126,9 @@ class _ReceiveState extends State<Receive> {
                       if (result == WhyFarther.share)
                         Share.share(jsonEncode(items[index].toJson()),
                             subject: items[index].title);
+                      if (result == WhyFarther.saveAs)
+                        saveFile(items[index].title,
+                            jsonEncode(items[index].toJson()));
                     },
                     itemBuilder: (BuildContext context) =>
                         <PopupMenuEntry<WhyFarther>>[
@@ -144,6 +148,14 @@ class _ReceiveState extends State<Receive> {
                           Text('Share'),
                         ]),
                       ),
+                      PopupMenuItem<WhyFarther>(
+                        value: WhyFarther.saveAs,
+                        child: Row(children: <Widget>[
+                          Icon(Icons.save),
+                          Padding(padding: EdgeInsets.only(left: 10.0)),
+                          Text('Save As'),
+                        ]),
+                      ),
                     ],
                   )
                 ],
@@ -153,6 +165,12 @@ class _ReceiveState extends State<Receive> {
         },
       ))
     ]));
+  }
+
+  void saveFile(String fileName, String content) async {
+    File file = File('/storage/emulated/0/Download/$fileName.json');
+    file.writeAsString(content);
+    connec.showSnackbar('Secret saved as file in Download directory.');
   }
 
   _showDialog(index) async {

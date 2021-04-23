@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_number_picker/flutter_number_picker.dart';
 import 'package:ntcdcrypto/ntcdcrypto.dart';
+import 'package:file_picker/file_picker.dart';
 
 import 'package:secret_share/dataStore.dart';
 import 'package:secret_share/nearby_connection.dart';
@@ -11,6 +13,8 @@ import 'package:secret_share/secret.dart';
 final titleController = TextEditingController();
 final secretController = TextEditingController();
 List<Secret> items = List<Secret>();
+bool isImage = false;
+String imageBase64;
 
 class Split extends StatefulWidget {
   @override
@@ -95,6 +99,26 @@ class _SplitState extends State<Split> {
                     border: OutlineInputBorder(),
                     labelText: 'Secret to crypt')),
             Padding(padding: EdgeInsets.only(top: 20.0)),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              MaterialButton(
+                onPressed: selectFile,
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: Icon(
+                  Icons.camera,
+                  size: 24,
+                ),
+              ),
+              MaterialButton(
+                onPressed: resetComponenet,
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: Icon(
+                  Icons.refresh,
+                  size: 24,
+                ),
+              ),
+            ]),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -129,7 +153,7 @@ class _SplitState extends State<Split> {
             ),
             Padding(padding: EdgeInsets.only(top: 20.0)),
             MaterialButton(
-              onPressed: _splitShares,
+              onPressed: splitShares,
               color: Colors.blue,
               textColor: Colors.white,
               child: Icon(
@@ -183,19 +207,49 @@ class _SplitState extends State<Split> {
         ));
   }
 
-  void _splitShares() {
+  void resetComponenet() {
+    titleController.text = '';
+    secretController.text = '';
+    setState(() {
+      items.clear();
+    });
+    isImage = false;
+    imageBase64 = '';
+  }
+
+  void selectFile() async {
+    FilePickerResult result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      File file = File(result.files.single.path);
+      secretController.text = result.files.first.name;
+      isImage = true;
+      imageBase64 = base64Encode(file.readAsBytesSync());
+      //print(base64Encode(file.readAsBytesSync()));
+      //Image.memory(base64Decode(base64Encode(file.readAsBytesSync())));
+
+      //file.writeAsBytesSync(base64Decode(base64Encode(file.readAsBytesSync())));
+    } else {
+      // User canceled the picker
+    }
+  }
+
+  void splitShares() {
     if (titleController.text != '') {
       if (secretController.text != '') {
         if (threshold <= shares) {
           items.clear();
           SSS sss = SSS();
-          List<String> arr =
-              sss.create(threshold, shares, secretController.text, true);
+          List<String> arr = sss.create(threshold, shares,
+              isImage ? imageBase64 : secretController.text, true);
           arr.asMap().forEach((index, element) {
             Secret s = Secret(
                 title: titleController.text + '-' + index.toString(),
                 share: element,
-                date: DateTime.now());
+                date: DateTime.now(),
+                type: isImage
+                    ? 'image/' + secretController.text.split('.').last
+                    : 'text');
             items.add(s);
           });
           setState(() {
