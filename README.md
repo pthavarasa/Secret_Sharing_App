@@ -125,7 +125,7 @@ gradle_version = '3.5.4'
 
 ## license
 
-...
+[GNU General Public License v2.0](https://github.com/pthavarasa/Secret_Sharing_App/blob/master/LICENSE)
 
 ## Contributors
 
