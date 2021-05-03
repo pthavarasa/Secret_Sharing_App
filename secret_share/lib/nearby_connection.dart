@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:device_info/device_info.dart';
 
-class Connection{
+class Connection {
   BuildContext context;
   String cId = "0";
   Function(String) onReceivedString;
@@ -14,11 +14,7 @@ class Connection{
   bool isStartAdvertising = false;
   bool isStartDiscovering = false;
 
-  Connection({
-    this.cId,
-    this.context,
-    this.onReceivedString
-  }){
+  Connection({this.cId, this.context, this.onReceivedString}) {
     initUserName();
   }
 
@@ -27,51 +23,57 @@ class Connection{
     userName = androidInfo.manufacturer + androidInfo.model;
   }
 
-  void setContext(BuildContext context){
+  void setContext(BuildContext context) {
     this.context = context;
   }
 
-  void receivedString(Function(String) onCountChange){
+  void receivedString(Function(String) onCountChange) {
     this.onReceivedString = onCountChange;
   }
 
-  String get getCid{
+  String get getCid {
     return cId;
   }
 
   void showSnackbar(dynamic a) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content: Text(a.toString()),
-      ));
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text(a.toString()),
+    ));
   }
 
   void permissionsHandling() async {
     if (await Nearby().checkLocationPermission()) {
       print('Location permissions granted :)');
-    }else{
+    } else {
       await Nearby().askLocationPermission();
     }
     if (await Nearby().checkLocationEnabled()) {
       print('Location is ON :)');
-    }else{
+    } else {
       await Nearby().enableLocationServices();
     }
   }
 
+  void askStoragePermission() async {
+    Nearby().askLocationAndExternalStoragePermission();
+  }
+
+  Future<bool> checkStoragePermission() async {
+    return await Nearby().checkExternalStoragePermission();
+  }
+
   void stopAdvertising() async {
-    if(!isStartAdvertising)
-      await Nearby().stopAdvertising();
+    if (!isStartAdvertising) await Nearby().stopAdvertising();
     //isStartAdvertising = false;
   }
 
   void stopDiscovery() async {
-    if(!isStartDiscovering)
-      await Nearby().stopDiscovery();
+    if (!isStartDiscovering) await Nearby().stopDiscovery();
     //isStartDiscovering = false;
   }
 
   void stopAllEndpoints() async {
-    if(isStartDiscovering || isStartAdvertising)
+    if (isStartDiscovering || isStartAdvertising)
       await Nearby().stopAllEndpoints();
     isStartDiscovering = isStartAdvertising = false;
   }
@@ -95,7 +97,7 @@ class Connection{
           showSnackbar("Disconnected: " + id);
         },
       );
-    showSnackbar("ADVERTISING: " + a.toString());
+      showSnackbar("ADVERTISING: " + a.toString());
     } catch (exception) {
       showSnackbar(exception);
     }
@@ -214,6 +216,7 @@ class Connection{
       },
     );
   }
+
   Widget connectionAboutDialog(BuildContext context) {
     return new AlertDialog(
       title: const Text('About Make Connection !'),
