@@ -99,10 +99,10 @@ To more details : [Flutter docs](https://flutter.dev/docs/deployment/android)
 
 ## Features
 
-- save/recover secret to folder as file
-- share it secret outside the app
-- sharing of secrets in part(Stream)
-- photo implementation
+- [x] save/recover secret to folder as file
+- [x] share it secret outside the app
+- [ ] sharing of secrets in part(Stream)
+- [x] photo implementation
 
 ## Version
 
