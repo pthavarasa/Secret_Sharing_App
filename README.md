@@ -27,6 +27,8 @@ To reconstruct the original secret, a minimum number of parts is required. In th
 
 To more details : [Wiki](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing)
 
+Demo video : [https://youtu.be/00NpF3quUl0](https://youtu.be/00NpF3quUl0)
+
 ## Installation
 
 To clone and run this application, you'll need [Git](https://git-scm.com) and [Flutter](https://flutter.dev/docs/get-started/install/) installed on your computer. 
