@@ -27,7 +27,7 @@ To reconstruct the original secret, a minimum number of parts is required. In th
 
 To more details : [Wiki](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing)
 
-Demo video : [https://youtu.be/00NpF3quUl0](https://youtu.be/00NpF3quUl0)
+Demo video : [https://youtu.be/8ZmjSzKLpEw](https://youtu.be/8ZmjSzKLpEw)
 
 ## Installation
 
